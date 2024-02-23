@@ -83,19 +83,19 @@ void feed_forward(network_t *network)
     }
 }
 
-void back_propagation(network_t *network)
-{
-    for (int i = 1; network->layers[i]; i++)
-    {
-        for (int j = 0; network->layers[i]->neurons[j]; j++)
-        {
-            for (int k = 0; k < network->hidden_height; k++)
-            {
-                network->layers[i]->neurons[j]->weights[k] = network->layers[i]->neurons[j]
-            }
-        }
-    }
-}
+// void back_propagation(network_t *network)
+// {
+//     for (int i = 1; network->layers[i]; i++)
+//     {
+//         for (int j = 0; network->layers[i]->neurons[j]; j++)
+//         {
+//             for (int k = 0; k < network->hidden_height; k++)
+//             {
+//                 network->layers[i]->neurons[j]->weights[k] = network->layers[i]->neurons[j]
+//             }
+//         }
+//     }
+// }
 
 void train(network_t *network, dataset_t *dataset, int iterations)
 {
@@ -115,7 +115,7 @@ void train(network_t *network, dataset_t *dataset, int iterations)
                 total_error +=  network->layers[network->hidden_width + 1]->neurons[k]->error;
             }
             printf("error: %f\n", total_error);
-            back_propagation(network);
+            //back_propagation(network);
         }
     }
 }

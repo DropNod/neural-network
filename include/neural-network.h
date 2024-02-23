@@ -24,7 +24,7 @@ typedef struct neuron_s
     double value;
     double error;
     double *weights;
-    double bias; 
+    double bias;
 }   neuron_t;
 neuron_t *init_neuron(int previous_height);
 void free_neuron(neuron_t *neuron);
