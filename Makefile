@@ -6,7 +6,7 @@ CFLAGS = -o2
 IFLAGS = -Iinclude
 LFLAGS = -Llib -lm -lcjson -lSDL2 -lSDL2_gfx
 
-FILES =	main neuron layer network dataset utils visualizer
+FILES =	main neuron layer network dataset utils visualizer coordinate
 
 SRCS = $(addprefix src/, $(addsuffix .c, $(FILES)))
 OBJS = $(addprefix obj/, $(addsuffix .o, $(FILES)))
