@@ -5,7 +5,8 @@ int main()
     network_t *network;
     dataset_t *dataset;
 
-    network = init_network(1, 2, 1000, 1);
+    network = init_network(3, 10, 10, 3);
+    init_gui(network);
     dataset = init_dataset("dataset.json");
     if (!network || !dataset)
         return (1);

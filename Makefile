@@ -4,9 +4,9 @@ CC = cc
 
 CFLAGS = -o2
 IFLAGS = -Iinclude
-LFLAGS = -Llib -lm -lcjson
+LFLAGS = -Llib -lm -lcjson -lSDL2 -lSDL2_gfx
 
-FILES =	main neuron layer network dataset utils
+FILES =	main neuron layer network dataset utils visualizer
 
 SRCS = $(addprefix src/, $(addsuffix .c, $(FILES)))
 OBJS = $(addprefix obj/, $(addsuffix .o, $(FILES)))
