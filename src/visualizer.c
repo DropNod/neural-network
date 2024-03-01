@@ -24,10 +24,9 @@ visualizer_t *init_visualizer(network_t *network)
         visualizer->coordinates[i] = malloc((network->hidden_height + 1) * sizeof(coordinate_t *));
         for (int j = 0; j < network->hidden_height; j++)
             visualizer->coordinates[i][j] = init_coordinate(x_step * (i + 1) - (x_step / 2), (j * y_step) + (y_step / 2));
-        visualizer->coordinates[i][network->hidden_width + 1] = NULL;
-        
+        visualizer->coordinates[i][network->hidden_height] = NULL;
     }
-    visualizer->coordinates[network->hidden_width + 1] = malloc((network->hidden_height + 1) * sizeof(coordinate_t *));
+    visualizer->coordinates[network->hidden_width + 1] = malloc((network->output_height + 1) * sizeof(coordinate_t *));
     for (int i = 0; i < network->output_height; i++)
         visualizer->coordinates[network->hidden_width + 1][i] = init_coordinate(x_step * (network->hidden_width + 2) - (x_step / 2), (i * y_step) + (y_step / 2) + ((HEIGHT / 2) - ((network->output_height * y_step) / 2)));
     visualizer->coordinates[network->hidden_width + 1][network->output_height] = NULL;
@@ -56,9 +55,18 @@ void render(visualizer_t *visualizer)
     int quit;
     SDL_Event event;
     char tmp[17];
-    int radius = 10;
+    int radius;
+    coordinate_t origin = {0, 0};
+    coordinate_t mouse_click_coords;
+    coordinate_t previous_mouse_coords;
+    coordinate_t mouse_coords;
+    int mouse_click_state;
+    float zoom;
 
     quit = 0;
+    radius = 10;
+    mouse_click_state = 0;
+    zoom = 1.0;
     if (visualizer->network->hidden_height > 10)
         radius = 10 / (visualizer->network->hidden_height - 10);
     else if (visualizer->network->hidden_width > 10)
@@ -66,8 +74,42 @@ void render(visualizer_t *visualizer)
     while (!quit)
     {
         while (SDL_PollEvent(&event) != 0)
-            if (event.type == SDL_QUIT)
-                quit = 1;
+        {
+            switch (event.type)
+            {
+                case SDL_QUIT:
+                    quit = 1;
+                    break;
+                case SDL_MOUSEBUTTONDOWN:
+                    if (event.button.button == SDL_BUTTON_LEFT)
+                    {
+                        mouse_click_state = 1;
+                        SDL_GetMouseState(&mouse_click_coords.x, &mouse_click_coords.y);
+                        mouse_click_coords.x -= origin.x;
+                        mouse_click_coords.y -= origin.y;
+                    }
+                    break;
+                case SDL_MOUSEBUTTONUP:
+                    if (event.button.button == SDL_BUTTON_LEFT) {
+                        mouse_click_state = 0;
+                    }
+                    break;
+                case SDL_MOUSEWHEEL:
+                    if (event.wheel.y > 0)
+                        zoom *= 1.01;
+                    else if (event.wheel.y < 0)
+                        zoom *= 0.99;
+                    break;
+            }
+        }
+        if (mouse_click_state) 
+        {
+            SDL_GetMouseState(&mouse_coords.x, &mouse_coords.y);
+            origin.x = mouse_coords.x -  mouse_click_coords.x;
+            origin.y = mouse_coords.y -  mouse_click_coords.y;
+            previous_mouse_coords.x = mouse_coords.x;
+            previous_mouse_coords.y = mouse_coords.y;
+        }
         SDL_SetRenderDrawColor(visualizer->renderer, 0, 0, 0, 255);
         SDL_RenderClear(visualizer->renderer);
         for (int i = 0; visualizer->coordinates[i]; i++)
@@ -75,10 +117,10 @@ void render(visualizer_t *visualizer)
             for (int j = 0; visualizer->coordinates[i][j]; j++)
             {
                 for (int k = 0; i < visualizer->network->hidden_width + 1 && visualizer->coordinates[i + 1][k]; k++)
-                    lineRGBA(visualizer->renderer, visualizer->coordinates[i][j]->x, visualizer->coordinates[i][j]->y, visualizer->coordinates[i + 1][k]->x, visualizer->coordinates[i + 1][k]->y, 255, 255, 255, 75);
-                filledCircleColor(visualizer->renderer, visualizer->coordinates[i][j]->x, visualizer->coordinates[i][j]->y, radius, 0x7D0000FF);
+                    lineRGBA(visualizer->renderer, zoom * (origin.x + visualizer->coordinates[i][j]->x), zoom * (origin.y + visualizer->coordinates[i][j]->y), zoom * (origin.x + visualizer->coordinates[i + 1][k]->x), zoom * (origin.y + visualizer->coordinates[i + 1][k]->y), 255, 255, 255, 75);
+                filledCircleColor(visualizer->renderer, zoom * (origin.x + visualizer->coordinates[i][j]->x), zoom * (origin.y + visualizer->coordinates[i][j]->y), zoom * radius, 0x7D0000FF);
                 sprintf(tmp, "%f", visualizer->network->layers[i]->neurons[j]->value);
-                stringRGBA(visualizer->renderer, visualizer->coordinates[i][j]->x - 35, visualizer->coordinates[i][j]->y - 10 - radius, tmp, 255, 255, 255, 255);
+                stringRGBA(visualizer->renderer, zoom * (origin.x + visualizer->coordinates[i][j]->x - 35), zoom * (origin.y + visualizer->coordinates[i][j]->y - 10 - radius), tmp, 255, 255, 255, 255);
             }
         }
         SDL_RenderPresent(visualizer->renderer);
