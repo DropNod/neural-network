@@ -7,6 +7,10 @@ network_t *init_network(int input_height, int hidden_width, int hidden_height, i
     network = malloc(sizeof(network_t));
     if (!network)
         return (NULL);
+    network->input_height = input_height;
+    network->hidden_width = hidden_width;
+    network->hidden_height = hidden_height;
+    network->output_height = output_height;
     network->layers = malloc((hidden_width + 3) * sizeof(layer_t));
     if (!network->layers)
     {
@@ -34,10 +38,6 @@ network_t *init_network(int input_height, int hidden_width, int hidden_height, i
     }
     network->layers[hidden_width + 1] = init_layer(output_height, hidden_height);
     network->layers[hidden_width + 2] = NULL;
-    network->input_height = input_height;
-    network->hidden_width = hidden_width;
-    network->hidden_height = hidden_height;
-    network->output_height = output_height;
     return (network);
 }
 

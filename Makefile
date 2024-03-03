@@ -2,7 +2,7 @@ NAME = neural-network
 
 CC = cc
 
-CFLAGS = -o2
+CFLAGS = -o2 -g
 IFLAGS = -Iinclude
 LFLAGS = -Llib -lm -lcjson -lSDL2 -lSDL2_gfx
 

@@ -21,7 +21,15 @@ int main()
     pthread_t thread_id;
 
     network = init_network(3, 10, 10, 3);
-    save_network(network, "test");;
+    save_network(network, "test");
+    free_network(network);
+    network = load_network("test");
+    if (!network)
+    {
+        printf("CACA\n");
+        return (1);
+    }
+    save_network(network, "test2");
     // visualizer = init_visualizer(network);
     // pthread_create(&thread_id, NULL, train_thread, network);
     // render(visualizer);
