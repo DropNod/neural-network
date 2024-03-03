@@ -30,8 +30,10 @@ visualizer_t *init_visualizer(network_t *network)
     for (int i = 0; i < network->output_height; i++)
         visualizer->coordinates[network->hidden_width + 1][i] = init_coordinate(x_step * (network->hidden_width + 2) - (x_step / 2), (i * y_step) + (y_step / 2) + ((HEIGHT / 2) - ((network->output_height * y_step) / 2)));
     visualizer->coordinates[network->hidden_width + 1][network->output_height] = NULL;
-    visualizer->window = SDL_CreateWindow("Neural network", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, WIDTH, HEIGHT, SDL_WINDOW_SHOWN);
+    visualizer->window = SDL_CreateWindow("Neural network", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, WIDTH, HEIGHT, SDL_WINDOW_RESIZABLE);
     visualizer->renderer = SDL_CreateRenderer(visualizer->window, -1, SDL_RENDERER_ACCELERATED);
+    visualizer->height = HEIGHT;
+    visualizer->width = WIDTH;
     return (visualizer);
 }
 
@@ -117,7 +119,7 @@ void render(visualizer_t *visualizer)
             for (int j = 0; visualizer->coordinates[i][j]; j++)
             {
                 for (int k = 0; i < visualizer->network->hidden_width + 1 && visualizer->coordinates[i + 1][k]; k++)
-                    lineRGBA(visualizer->renderer, zoom * (origin.x + visualizer->coordinates[i][j]->x), zoom * (origin.y + visualizer->coordinates[i][j]->y), zoom * (origin.x + visualizer->coordinates[i + 1][k]->x), zoom * (origin.y + visualizer->coordinates[i + 1][k]->y), 255, 255, 255, 75);
+                    lineRGBA(visualizer->renderer, zoom * (origin.x + visualizer->coordinates[i][j]->x), zoom * (origin.y + visualizer->coordinates[i][j]->y), zoom * (origin.x + visualizer->coordinates[i + 1][k]->x), zoom * (origin.y + visualizer->coordinates[i + 1][k]->y), 255, 255, 255, (visualizer->network->layers[i + 1]->neurons[k]->weights[j] + 0.1) * 5 * 75);
                 filledCircleColor(visualizer->renderer, zoom * (origin.x + visualizer->coordinates[i][j]->x), zoom * (origin.y + visualizer->coordinates[i][j]->y), zoom * radius, 0x7D0000FF);
                 sprintf(tmp, "%f", visualizer->network->layers[i]->neurons[j]->value);
                 stringRGBA(visualizer->renderer, zoom * (origin.x + visualizer->coordinates[i][j]->x - 35), zoom * (origin.y + visualizer->coordinates[i][j]->y - 10 - radius), tmp, 255, 255, 255, 255);
