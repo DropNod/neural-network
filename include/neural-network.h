@@ -38,11 +38,11 @@ void free_layer(layer_t *layer);
 
 typedef struct network_s
 {
-    layer_t **layers;
     int input_height;
     int hidden_width;
     int hidden_height;
     int output_height;
+    layer_t **layers;
 }   network_t;
 network_t *init_network(int input_height, int hidden_width, int hidden_height, int output_height);
 void free_network(network_t *network);
@@ -52,3 +52,4 @@ void train(network_t *network, dataset_t *dataset, int iterations);
 double random_double(double min, double max);
 
 int save_network(network_t *network, char *filename);
+network_t *load_network(char *filename);

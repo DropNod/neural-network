@@ -1,5 +1,9 @@
 network:
 {
+	input_height: 3
+	hidden_width: 10
+	hidden_height: 10
+	output_height: 3
 	layers:
 	{
 		neurons:
@@ -567,4 +571,4 @@ network:
 			bias: -0.059554
 		}
 	}
-}tneurons
+}
