@@ -24,6 +24,8 @@ typedef struct visualizer_s
     coordinate_t ***coordinates;
     SDL_Window *window;
     SDL_Renderer *renderer;
+    int height;
+    int width;
 }   visualizer_t;
 
 visualizer_t *init_visualizer(network_t *network);

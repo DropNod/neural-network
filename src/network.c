@@ -108,8 +108,10 @@ void train(network_t *network, dataset_t *dataset, int iterations)
             total_error = 0.0;
             for (int k = 0; network->layers[0]->neurons[k]; k++)
                 network->layers[0]->neurons[k]->value = dataset->input[j][k];
-            feed_forward(network);
             network->layers[0]->neurons[0]->value = random_double(-1, 1);
+            network->layers[0]->neurons[1]->value = random_double(-1, 1);
+            network->layers[0]->neurons[2]->value = random_double(-1, 1);
+            feed_forward(network);
             //printf("%f\n", network->layers[0]->neurons[0]->value);
             for (int k = 0; network->layers[network->hidden_width + 1]->neurons[k]; k++)
             {
