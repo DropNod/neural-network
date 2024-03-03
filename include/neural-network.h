@@ -50,3 +50,5 @@ void free_network(network_t *network);
 void train(network_t *network, dataset_t *dataset, int iterations);
 
 double random_double(double min, double max);
+
+int save_network(network_t *network, char *filename);
