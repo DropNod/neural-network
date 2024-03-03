@@ -21,11 +21,12 @@ int main()
     pthread_t thread_id;
 
     network = init_network(3, 10, 10, 3);
-    visualizer = init_visualizer(network);
-    pthread_create(&thread_id, NULL, train_thread, network);
-    render(visualizer);
-    free_visualizer(visualizer);
-    pthread_join(thread_id, NULL);
+    save_network(network, "test");;
+    // visualizer = init_visualizer(network);
+    // pthread_create(&thread_id, NULL, train_thread, network);
+    // render(visualizer);
+    // free_visualizer(visualizer);
+    // pthread_join(thread_id, NULL);
     free_network(network);
     return (0);
 }
