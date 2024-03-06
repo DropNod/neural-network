@@ -51,7 +51,6 @@ void train(network_t *network, dataset_t *dataset, int iterations)
             feed_forward(network);
             for (int k = 0; network->layers[network->hidden_width + 1]->neurons[k]; k++)
             {
-                printf("input: %lf, output: %lf\n", dataset->input[j][k], dataset->output[j][k]);
                 network->layers[network->hidden_width + 1]->neurons[k]->error = pow(network->layers[network->hidden_width + 1]->neurons[k]->value - dataset->output[j][k], 2) / 2;
                 total_error +=  network->layers[network->hidden_width + 1]->neurons[k]->error;
             }

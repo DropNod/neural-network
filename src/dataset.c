@@ -25,6 +25,9 @@ dataset_t *init_dataset(char *path)
         for (int j = 0; j < dataset->input_size; j++)
             if (!fscanf(file, "%*[^-0-9]%lf", &dataset->input[i][j]))
                 return (free_dataset(dataset), NULL);
+    }
+    for (int i = 0; i < dataset->size; i++)
+    {
         dataset->output[i] = full_calloc(dataset->output_size * sizeof(double));
         if (!dataset->output[i])
             return (free_dataset(dataset), NULL);

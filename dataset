@@ -3,7 +3,6 @@ dataset:
 	size: 2,
 	input_size: 1,
 	output_size: 1,
-	output_height: 3,
 	inputs: [[10], [27]],
     outputs: [[1], [0]]
 }
