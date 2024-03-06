@@ -24,6 +24,7 @@ int main()
     save_network(network, "test");
     free_network(network);
     network = load_network("test");
+    //write(1, "sucess\n", 7);
     if (!network)
     {
         printf("CACA\n");
