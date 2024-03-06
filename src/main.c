@@ -26,6 +26,7 @@ int main()
     train(network, dataset, 1);
     save_network(network, "save");
     free_network(network);
+    free_dataset(dataset);
     // visualizer = init_visualizer(network);
     // pthread_create(&thread_id, NULL, train_thread, network);
     // render(visualizer);
