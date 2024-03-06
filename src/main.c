@@ -8,8 +8,12 @@ void *train_thread(void *arg)
     dataset_t *dataset;
 
     network = (network_t *) arg;
-    dataset = init_dataset("dataset.json");
-    train(network, dataset, 1000000);
+    dataset = init_dataset("dataset");
+    if (!dataset)
+        return (error("Can't init dataset"), NULL);
+    if (!train(network, dataset, 100000000))
+        return (error("Can't train network"), NULL);
+    free_dataset(dataset);
     pthread_exit(NULL);
 }
 
@@ -18,24 +22,18 @@ int main()
 {
     network_t *network;
     dataset_t *dataset;
-    // visualizer_t *visualizer;
-    // pthread_t thread_id;
+    visualizer_t *visualizer;
+    pthread_t thread_id;
 
-    network = init_network(1, 10, 10, 1);
+    network = init_network(1, 1, 5, 1);
     if (!network)
         return (error("Can't init network"), 1);
-    dataset = init_dataset("dataset");
-    if (!dataset)
-        return (error("Can't init dataset"), 1);
-    if (!train(network, dataset, 1))
-        return (error("Can't train network"), 1);
     save_network(network, "save");
+    visualizer = init_visualizer(network);
+    pthread_create(&thread_id, NULL, train_thread, network);
+    render(visualizer);
+    free_visualizer(visualizer);
+    pthread_join(thread_id, NULL);
     free_network(network);
-    free_dataset(dataset);
-    // visualizer = init_visualizer(network);
-    // pthread_create(&thread_id, NULL, train_thread, network);
-    // render(visualizer);
-    // free_visualizer(visualizer);
-    // pthread_join(thread_id, NULL);
     return (0);
 }
