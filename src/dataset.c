@@ -2,89 +2,51 @@
 
 dataset_t *init_dataset(char *path)
 {
-    // Ouvrir le fichier JSON
-    FILE *file = fopen(path, "r");
-    if (file == NULL) {
-        printf("Erreur lors de l'ouverture du fichier.\n");
-        return (NULL);
-    }
-
-    // Lire le contenu du fichier
-    fseek(file, 0, SEEK_END);
-    long file_size = ftell(file);
-    fseek(file, 0, SEEK_SET);
-
-    char *json_string = (char *)malloc(file_size + 1);
-    if (json_string == NULL) {
-        printf("Erreur d'allocation mémoire.\n");
-        fclose(file);
-        return (NULL);
-    }
-    fread(json_string, 1, file_size, file);
-    json_string[file_size] = '\0'; // Terminer la chaîne par un caractère nul
-    fclose(file);
-
-    // Parse le JSON
-    cJSON *root = cJSON_Parse(json_string);
-    if (root == NULL) {
-        printf("Erreur de parsing JSON.\n");
-        free(json_string);
-        return (NULL);
-    }
-
-    // Initialisation du dataset
     dataset_t *dataset;
-    dataset = malloc(sizeof(dataset_t));
-    dataset->size = cJSON_GetArraySize(root);
-    dataset->input = malloc(dataset->size * sizeof(double *));
-    dataset->output = malloc(dataset->size * sizeof(double *));
-    if (dataset->input == NULL || dataset->output == NULL) {
-        printf("Erreur d'allocation mémoire.\n");
-        cJSON_Delete(root);
-        free(json_string);
+    FILE *file;
+
+    dataset = full_calloc(sizeof(dataset_t));
+    if (!dataset)
         return (NULL);
+    file = fopen(path, "r");
+    if (!file)
+        return (free(dataset), NULL);
+    if (!fscanf(file, "%*[^-0-9]%d%*[^-0-9]%d%*[^-0-9]%d", &dataset->size, &dataset->input_size, &dataset->output_size))
+        return (free(dataset), NULL);
+    dataset->input = full_calloc(dataset->size * sizeof(double *));
+    dataset->output = full_calloc(dataset->size * sizeof(double *));
+    if (!dataset->input || !dataset->output)
+        return (free_dataset(dataset), NULL);
+    for (int i = 0; i < dataset->size; i++)
+    {
+        dataset->input[i] = full_calloc(dataset->input_size * sizeof(double));
+        if (!dataset->input[i])
+            return (free_dataset(dataset), NULL);
+        for (int j = 0; j < dataset->input_size; j++)
+            if (!fscanf(file, "%*[^-0-9]%lf", &dataset->input[i][j]))
+                return (free_dataset(dataset), NULL);
+        dataset->output[i] = full_calloc(dataset->output_size * sizeof(double));
+        if (!dataset->output[i])
+            return (free_dataset(dataset), NULL);
+        for (int j = 0; j < dataset->output_size; j++)
+            if (!fscanf(file, "%*[^-0-9]%lf", &dataset->output[i][j]))
+                return (free_dataset(dataset), NULL);
     }
-
-    // Parcours des éléments du tableau
-    int i = 0;
-    cJSON *item;
-    cJSON_ArrayForEach(item, root) {
-        cJSON *input = cJSON_GetObjectItemCaseSensitive(item, "input");
-        cJSON *output = cJSON_GetObjectItemCaseSensitive(item, "output");
-
-        // Vérification et stockage des données
-        if (cJSON_IsArray(input) && cJSON_IsArray(output)) {
-            cJSON *input_element = cJSON_GetArrayItem(input, 0);
-            cJSON *output_element = cJSON_GetArrayItem(output, 0);
-
-            if (cJSON_IsNumber(input_element) && cJSON_IsNumber(output_element)) {
-                // Allocation et stockage des données dans le dataset
-                dataset->input[i] = malloc(sizeof(double));
-                dataset->output[i] = malloc(sizeof(double));
-                if (dataset->input[i] == NULL || dataset->output[i] == NULL) {
-                    printf("Erreur d'allocation mémoire.\n");
-                    free_dataset(dataset);
-                    cJSON_Delete(root);
-                    free(json_string);
-                    return (NULL);
-                }
-                dataset->input[i][0] = input_element->valuedouble;
-                dataset->output[i][0] = output_element->valuedouble;
-                i++;
-            }
-        }
-    }
+    fclose(file);
     return (dataset);
 }
 
 void free_dataset(dataset_t *dataset)
 {
-    for (size_t j = 0; j < dataset->size; j++)
+    if (dataset)
     {
-        free(dataset->input[j]);
-        free(dataset->output[j]);
+        for (size_t i = 0; i < dataset->size; i++)
+        {
+            secure_free(dataset->input[i]);
+            secure_free(dataset->output[i]);
+        }
+        secure_free(dataset->input);
+        secure_free(dataset->output);
+        free(dataset);
     }
-    free(dataset->input);
-    free(dataset->output);
-    free(dataset);
 }
