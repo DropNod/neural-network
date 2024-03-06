@@ -1,6 +1,6 @@
 #include "neural-network.h"
 
-dataset_t *init_dataset(char *path)
+dataset_t *init_dataset(const char *path)
 {
     dataset_t *dataset;
     FILE *file;
@@ -11,27 +11,27 @@ dataset_t *init_dataset(char *path)
     file = fopen(path, "r");
     if (!file)
         return (free(dataset), NULL);
-    if (!fscanf(file, "%*[^-0-9]%d%*[^-0-9]%d%*[^-0-9]%d", &dataset->size, &dataset->input_size, &dataset->output_size))
+    if (!fscanf(file, "%*[^-0-9]%zu%*[^-0-9]%zu%*[^-0-9]%zu", &dataset->size, &dataset->input_size, &dataset->output_size))
         return (free(dataset), NULL);
     dataset->input = full_calloc(dataset->size * sizeof(double *));
     dataset->output = full_calloc(dataset->size * sizeof(double *));
     if (!dataset->input || !dataset->output)
         return (free_dataset(dataset), NULL);
-    for (int i = 0; i < dataset->size; i++)
+    for (size_t i = 0; i < dataset->size; i++)
     {
         dataset->input[i] = full_calloc(dataset->input_size * sizeof(double));
         if (!dataset->input[i])
             return (free_dataset(dataset), NULL);
-        for (int j = 0; j < dataset->input_size; j++)
+        for (size_t j = 0; j < dataset->input_size; j++)
             if (!fscanf(file, "%*[^-0-9]%lf", &dataset->input[i][j]))
                 return (free_dataset(dataset), NULL);
     }
-    for (int i = 0; i < dataset->size; i++)
+    for (size_t i = 0; i < dataset->size; i++)
     {
         dataset->output[i] = full_calloc(dataset->output_size * sizeof(double));
         if (!dataset->output[i])
             return (free_dataset(dataset), NULL);
-        for (int j = 0; j < dataset->output_size; j++)
+        for (size_t j = 0; j < dataset->output_size; j++)
             if (!fscanf(file, "%*[^-0-9]%lf", &dataset->output[i][j]))
                 return (free_dataset(dataset), NULL);
     }
