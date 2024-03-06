@@ -17,19 +17,15 @@ void *train_thread(void *arg)
 int main()
 {
     network_t *network;
-    visualizer_t *visualizer;
+    //visualizer_t *visualizer;
     pthread_t thread_id;
 
     network = init_network(3, 10, 10, 3);
     save_network(network, "test");
     free_network(network);
     network = load_network("test");
-    //write(1, "sucess\n", 7);
     if (!network)
-    {
-        printf("CACA\n");
         return (1);
-    }
     save_network(network, "test2");
     // visualizer = init_visualizer(network);
     // pthread_create(&thread_id, NULL, train_thread, network);

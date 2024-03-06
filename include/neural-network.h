@@ -10,6 +10,7 @@
 
 #define LEARNING_RATE 1
 
+//dataset.c
 typedef struct dataset_s
 {
     double **input;
@@ -19,6 +20,7 @@ typedef struct dataset_s
 dataset_t *init_dataset(char *path);
 void free_dataset(dataset_t *dataset);
 
+//neuron.c
 typedef struct neuron_s
 {
     double value;
@@ -29,6 +31,7 @@ typedef struct neuron_s
 neuron_t *init_neuron(int previous_height);
 void free_neuron(neuron_t *neuron);
 
+//layer.c
 typedef struct layer_s
 {
     neuron_t **neurons;
@@ -36,6 +39,7 @@ typedef struct layer_s
 layer_t *init_layer(int height, int previous_height);
 void free_layer(layer_t *layer);
 
+//network.c
 typedef struct network_s
 {
     int input_height;
@@ -46,10 +50,13 @@ typedef struct network_s
 }   network_t;
 network_t *init_network(int input_height, int hidden_width, int hidden_height, int output_height);
 void free_network(network_t *network);
-
-void train(network_t *network, dataset_t *dataset, int iterations);
-
-double random_double(double min, double max);
-
 int save_network(network_t *network, char *filename);
 network_t *load_network(char *filename);
+
+//train.c
+void train(network_t *network, dataset_t *dataset, int iterations);
+
+//utils.c
+double random_double(double min, double max);
+double relu(double x);
+double sigmoid(double x);

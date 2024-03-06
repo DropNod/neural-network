@@ -52,74 +52,94 @@ void free_network(network_t *network)
     }
 }
 
-double relu(double x)
+int save_network(network_t *network, char *filename)
 {
-    return (x > 0 ? x : 0);
-}
+    FILE *file;
+    int previous_layer_height;
 
-double sigmoid(double x)
-{
-    return (1 / (1 + exp(-x)));
-}
-
-void feed_forward(network_t *network)
-{
-    for (int i = 0; network->layers[1]->neurons[i]; i++)
+    if (!network)
+        return (0);
+    file = fopen(filename, "w");
+    if (!file)
+        return (0);
+    fprintf(file, "network:\n{\n\tinput_height: %d\n\thidden_width: %d\n\thidden_height: %d\n\toutput_height: %d\n\tlayers:\n",
+        network->input_height,
+        network->hidden_width,
+        network->hidden_height,
+        network->output_height);
+    for (int i = 0; network->layers[i]; i++)
     {
-        network->layers[1]->neurons[i]->value = 0.0;
-        for (int j = 0; j < network->input_height; j++)
-            network->layers[1]->neurons[i]->value += network->layers[0]->neurons[j]->value * network->layers[1]->neurons[i]->weights[j];
-        network->layers[1]->neurons[i]->value = relu(network->layers[1]->neurons[i]->value + network->layers[1]->neurons[i]->bias); 
-    }
-    for (int i = 2; network->layers[i]; i++)
-    {
+        if (i == 0)
+            previous_layer_height = 0;
+        else if (i == 1)
+            previous_layer_height = network->input_height;
+        else
+            previous_layer_height = network->hidden_height;
+        fprintf(file, "\t{\n\t\tneurons:\n");
         for (int j = 0; network->layers[i]->neurons[j]; j++)
         {
-            network->layers[i]->neurons[j]->value = 0.0;
-            for (int k = 0; k < network->hidden_height; k++)
-                network->layers[i]->neurons[j]->value += network->layers[i - 1]->neurons[k]->value * network->layers[i]->neurons[j]->weights[k];
-            network->layers[i]->neurons[j]->value = sigmoid(network->layers[i]->neurons[j]->value + network->layers[i]->neurons[j]->bias); 
+            fprintf(file, "\t\t{\n\t\t\tvalue: %lf\n\t\t\tweights: [", network->layers[i]->neurons[j]->value);
+            for (int k = 0; k < previous_layer_height; k++)
+                fprintf(file, k + 1 < previous_layer_height ? "%lf, " : "%lf", network->layers[i]->neurons[j]->weights[k]);
+            fprintf(file, network->layers[i]->neurons[j + 1] ? "]\n\t\t\tbias: %lf\n\t\t},\n" : "]\n\t\t\tbias: %lf\n\t\t}\n", network->layers[i]->neurons[j]->bias);
         }
+        fprintf(file, network->layers[i + 1] ? "\t},\n" : "\t}\n");
     }
+    fprintf(file, "}");
+    fclose(file);
+    return (1);
 }
 
-// void back_propagation(network_t *network)
-// {
-//     for (int i = 1; network->layers[i]; i++)
-//     {
-//         for (int j = 0; network->layers[i]->neurons[j]; j++)
-//         {
-//             for (int k = 0; k < network->hidden_height; k++)
-//             {
-//                 network->layers[i]->neurons[j]->weights[k] = network->layers[i]->neurons[j]->
-//             }
-//         }
-//     }
-// }
-
-void train(network_t *network, dataset_t *dataset, int iterations)
+network_t *load_network(char *filename)
 {
-    double total_error;
+    FILE *file;
+    int input_height;
+    int hidden_width;
+    int hidden_height;
+    int output_height;
+    int previous_layer_height;
+    network_t *network;
 
-    for (int i = 0; i < iterations; i++)
+    file = fopen(filename, "r");
+    if (!fscanf(file, "network:\n{\n\tinput_height: %d\n\thidden_width: %d\n\thidden_height: %d\n\toutput_height: %d\n\tlayers:\n", &input_height, &hidden_width, &hidden_height, &output_height))
     {
-        for (int j = 0; j < dataset->size; j++)
+        fclose(file);
+        return (NULL);
+    }
+    network = init_network(input_height, hidden_width, hidden_height, output_height);
+    for (int i = 0; network->layers[i]; i++)
+    {
+        if (i == 0)
+            previous_layer_height = 0;
+        else if (i == 1)
+            previous_layer_height = input_height;
+        else
+            previous_layer_height = hidden_height;
+        for (int j = 0; network->layers[i]->neurons[j]; j++)
         {
-            total_error = 0.0;
-            for (int k = 0; network->layers[0]->neurons[k]; k++)
-                network->layers[0]->neurons[k]->value = dataset->input[j][k];
-            network->layers[0]->neurons[0]->value = random_double(-1, 1);
-            network->layers[0]->neurons[1]->value = random_double(-1, 1);
-            network->layers[0]->neurons[2]->value = random_double(-1, 1);
-            feed_forward(network);
-            //printf("%f\n", network->layers[0]->neurons[0]->value);
-            for (int k = 0; network->layers[network->hidden_width + 1]->neurons[k]; k++)
+            if (!fscanf(file, "%*[^-0-9]%lf", &network->layers[i]->neurons[j]->value))
             {
-                network->layers[network->hidden_width + 1]->neurons[k]->error = pow(network->layers[network->hidden_width + 1]->neurons[k]->value - dataset->output[j][k], 2) / 2;
-                total_error +=  network->layers[network->hidden_width + 1]->neurons[k]->error;
+                fclose(file);
+                free_network(network);
+                return (NULL);
             }
-            //printf("error: %f\n", total_error);
-            // back_propagation(network);
+            for (int k = 0; i != 0 && k < previous_layer_height; k++)
+            {
+                if (!fscanf(file, "%*[^-0-9]%lf", &network->layers[i]->neurons[j]->weights[k]))
+                {
+                    fclose(file);
+                    free_network(network);
+                    return (NULL);
+                }
+            }
+            if (!fscanf(file, "%*[^-0-9]%lf", &network->layers[i]->neurons[j]->bias))
+            {
+                fclose(file);
+                free_network(network);
+                return (NULL);
+            }
         }
     }
+    fclose(file);
+    return (network);
 }
