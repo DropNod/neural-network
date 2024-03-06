@@ -6,7 +6,7 @@
 #include <time.h>
 #include <math.h>
 
-#define LEARNING_RATE 1
+#define LEARNING_RATE 0.01
 #define RED	"\033[31;1m"
 #define END	"\033[0m"
 
@@ -29,7 +29,9 @@ typedef struct neuron_s
     double value;
     double error;
     double *weights;
+    double *delta_weights;
     double bias;
+    double delta_bias;
 }   neuron_t;
 neuron_t *init_neuron(const size_t previous_height);
 void free_neuron(neuron_t *neuron);
@@ -66,3 +68,4 @@ void *full_calloc(const size_t size);
 double random_double(const double min, const double max);
 double relu(const double x);
 double sigmoid(const double x);
+double sigmoid_derivative(double x);
