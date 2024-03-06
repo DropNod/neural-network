@@ -1,6 +1,6 @@
 #include "neural-network.h"
 
-void feed_forward(network_t *network)
+static void feed_forward(network_t *network)
 {
     for (int i = 0; network->layers[1]->neurons[i]; i++)
     {
@@ -39,6 +39,8 @@ void train(network_t *network, dataset_t *dataset, int iterations)
 {
     double total_error;
 
+    if (network->input_height != dataset->input_size || network->output_height != dataset->output_size )
+        return ;
     for (int i = 0; i < iterations; i++)
     {
         for (int j = 0; j < dataset->size; j++)
@@ -49,6 +51,7 @@ void train(network_t *network, dataset_t *dataset, int iterations)
             feed_forward(network);
             for (int k = 0; network->layers[network->hidden_width + 1]->neurons[k]; k++)
             {
+                printf("input: %lf, output: %lf\n", dataset->input[j][k], dataset->output[j][k]);
                 network->layers[network->hidden_width + 1]->neurons[k]->error = pow(network->layers[network->hidden_width + 1]->neurons[k]->value - dataset->output[j][k], 2) / 2;
                 total_error +=  network->layers[network->hidden_width + 1]->neurons[k]->error;
             }

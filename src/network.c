@@ -62,7 +62,7 @@ int save_network(network_t *network, char *filename)
     file = fopen(filename, "w");
     if (!file)
         return (0);
-    fprintf(file, "network:\n{\n\tinput_height: %d\n\thidden_width: %d\n\thidden_height: %d\n\toutput_height: %d\n\tlayers:\n",
+    fprintf(file, "network:\n{\n\tinput_height: %d,\n\thidden_width: %d,\n\thidden_height: %d,\n\toutput_height: %d,\n\tlayers:\n",
         network->input_height,
         network->hidden_width,
         network->hidden_height,
@@ -78,10 +78,10 @@ int save_network(network_t *network, char *filename)
         fprintf(file, "\t{\n\t\tneurons:\n");
         for (int j = 0; network->layers[i]->neurons[j]; j++)
         {
-            fprintf(file, "\t\t{\n\t\t\tvalue: %lf\n\t\t\tweights: [", network->layers[i]->neurons[j]->value);
+            fprintf(file, "\t\t{\n\t\t\tvalue: %lf,\n\t\t\tweights: [", network->layers[i]->neurons[j]->value);
             for (int k = 0; k < previous_layer_height; k++)
                 fprintf(file, k + 1 < previous_layer_height ? "%lf, " : "%lf", network->layers[i]->neurons[j]->weights[k]);
-            fprintf(file, network->layers[i]->neurons[j + 1] ? "]\n\t\t\tbias: %lf\n\t\t},\n" : "]\n\t\t\tbias: %lf\n\t\t}\n", network->layers[i]->neurons[j]->bias);
+            fprintf(file, network->layers[i]->neurons[j + 1] ? "],\n\t\t\tbias: %lf\n\t\t},\n" : "],\n\t\t\tbias: %lf\n\t\t}\n", network->layers[i]->neurons[j]->bias);
         }
         fprintf(file, network->layers[i + 1] ? "\t},\n" : "\t}\n");
     }
@@ -101,7 +101,7 @@ network_t *load_network(char *filename)
     network_t *network;
 
     file = fopen(filename, "r");
-    if (!fscanf(file, "network:\n{\n\tinput_height: %d\n\thidden_width: %d\n\thidden_height: %d\n\toutput_height: %d\n\tlayers:\n", &input_height, &hidden_width, &hidden_height, &output_height))
+    if (!fscanf(file, "network:\n{\n\tinput_height: %d,\n\thidden_width: %d,\n\thidden_height: %d,\n\toutput_height: %d,\n\tlayers:\n", &input_height, &hidden_width, &hidden_height, &output_height))
     {
         fclose(file);
         return (NULL);

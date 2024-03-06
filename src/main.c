@@ -17,21 +17,19 @@ void *train_thread(void *arg)
 int main()
 {
     network_t *network;
-    //visualizer_t *visualizer;
-    pthread_t thread_id;
+    dataset_t *dataset;
+    // visualizer_t *visualizer;
+    // pthread_t thread_id;
 
-    network = init_network(3, 10, 10, 3);
-    save_network(network, "test");
+    network = init_network(1, 10, 10, 1);
+    dataset = init_dataset("dataset");
+    train(network, dataset, 1);
+    save_network(network, "save");
     free_network(network);
-    network = load_network("test");
-    if (!network)
-        return (1);
-    save_network(network, "test2");
     // visualizer = init_visualizer(network);
     // pthread_create(&thread_id, NULL, train_thread, network);
     // render(visualizer);
     // free_visualizer(visualizer);
     // pthread_join(thread_id, NULL);
-    free_network(network);
     return (0);
 }

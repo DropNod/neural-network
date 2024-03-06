@@ -6,16 +6,16 @@
 #include <time.h>
 #include <math.h>
 
-#include "cJSON.h"
-
 #define LEARNING_RATE 1
 
 //dataset.c
 typedef struct dataset_s
 {
+    size_t size;
+    size_t input_size;
+    size_t output_size;
     double **input;
     double **output;
-    size_t size;
 }   dataset_t;
 dataset_t *init_dataset(char *path);
 void free_dataset(dataset_t *dataset);
@@ -57,6 +57,8 @@ network_t *load_network(char *filename);
 void train(network_t *network, dataset_t *dataset, int iterations);
 
 //utils.c
+void secure_free(void *ptr);
+void *full_calloc(size_t size);
 double random_double(double min, double max);
 double relu(double x);
 double sigmoid(double x);

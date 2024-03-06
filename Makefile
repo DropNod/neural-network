@@ -4,7 +4,7 @@ CC = cc
 
 CFLAGS = -o2 -g
 IFLAGS = -Iinclude
-LFLAGS = -Llib -lm -lcjson -lSDL2 -lSDL2_gfx
+LFLAGS = -Llib -lm -lSDL2 -lSDL2_gfx
 
 FILES =	main neuron layer network train dataset utils visualizer coordinate
 
