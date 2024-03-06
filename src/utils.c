@@ -1,5 +1,10 @@
 #include "neural-network.h"
 
+void error(const char *error)
+{
+	dprintf(2, "[%sError%s] %s\n", RED, END, error);
+}
+
 void secure_free(void *ptr)
 {
     if (ptr)
@@ -13,6 +18,7 @@ void *full_calloc(size_t size)
 
 double random_double(double min, double max)
 {
+    srand(clock());
     return (min + ((double)rand() / RAND_MAX) * (max - min));
 }
 

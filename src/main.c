@@ -22,8 +22,13 @@ int main()
     // pthread_t thread_id;
 
     network = init_network(1, 10, 10, 1);
+    if (!network)
+        return (error("Can't init network"), 1);
     dataset = init_dataset("dataset");
-    train(network, dataset, 1);
+    if (!dataset)
+        return (error("Can't init dataset"), 1);
+    if (!train(network, dataset, 1))
+        return (error("Can't train network"), 1);
     save_network(network, "save");
     free_network(network);
     free_dataset(dataset);
